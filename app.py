@@ -5,13 +5,17 @@ from google.cloud.aiplatform.generative_models import GenerativeModel
 from google.cloud import aiplatform
 from dotenv import load_dotenv
 import json
-load_dotenv()
 import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 # ----------- App Setup -----------
 app = Flask(__name__)
+# Use only one SECRET_KEY configuration
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY", "fallback_secret")
 
+# Initialize AI Platform
 aiplatform.init(
     project=os.getenv("GCP_PROJECT_ID"),
     location=os.getenv("GCP_LOCATION", "us-central1")
@@ -65,7 +69,6 @@ def signup():
         print(f"[ERROR] Could not add user: {e}")
         return jsonify({'message': 'Database error'}), 500
 
-    # Show all users in console for verification
     users = User.query.all()
     print("Current users in DB:")
     for u in users:
@@ -98,7 +101,7 @@ def list_users():
     users = User.query.all()
     return jsonify([{'id': u.id, 'username': u.username, 'email': u.email} for u in users])
 
-
+# Instantiate Gemini model
 model = GenerativeModel("gemini-1.5-flash")
 
 @app.route("/api/questions", methods=["GET"])
@@ -112,7 +115,7 @@ def get_questions():
     """
     response = model.generate_content(prompt)
     try:
-        questions = json.loads(response.text)  # Gemini returns JSON-like text
+        questions = json.loads(response.text)
     except json.JSONDecodeError:
         return jsonify({"error": "Could not parse Gemini response as JSON", "raw": response.text}), 500
 

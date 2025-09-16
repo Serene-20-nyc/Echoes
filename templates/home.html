@@ -19,10 +19,11 @@
     <nav class="navbar">
         <div class="brand">Segreta</div>
         <ul class="nav-links">
-            <li><a href="{{ url_for('index') }}">Home</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="#">Gallery</a></li>
-            <li><a href="#">Contact</a></li>
+            <li><a href="{{ url_for('home') }}">Home</a></li>
+            <li><a href="{{ url_for('about') }}">About</a></li>
+            <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
+            <li><a href="{{ url_for('contact') }}">Contact</a></li>
+            <li><a href="{{ url_for('quiz') }}">Quiz</a></li>
             <li><button class="btn"><a href="{{ url_for('login') }}">Login</a></button></li>
             <li><button class="btn signup"><a href="{{ url_for('signup') }}">Sign Up</a></button></li>
         </ul>
