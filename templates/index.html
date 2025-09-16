@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Echoes of Love – Cosmic Flower Quiz</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at top, #1a0933, #05010f);
+      color: #f4eaff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 720px;
+      width: 90%;
+      box-shadow: 0 0 30px rgba(170, 100, 255, 0.3);
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.8em;
+      color: #ddd;
+      background: linear-gradient(90deg,#ffb6f9,#7be5c9);
+        
+    }
+    .question {
+      margin: 20px 0;
+      padding: 16px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 12px;
+    }
+    .options button {
+      display: block;
+      width: 100%;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #f4eaff;
+      padding: 10px;
+      margin: 6px 0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .options button:hover, .options button.selected {
+      background: linear-gradient(90deg,#7be5c9,#ffb6f9);
+      color: #05010f;
+      font-weight: 600;
+    }
+    .btn {
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .next { background:#7be5c9; color:#05010f; }
+    .back { background:#444; color:#ddd; }
+    #result { margin-top:20px; padding:20px; border-radius:12px; background:rgba(255,255,255,0.07); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Echoes of Love ✨🌸</h1>
+    <div id="quiz"></div>
+    <div style="display:flex;justify-content:space-between;">
+      <button id="backBtn" class="btn back" style="display:none">Back</button>
+      <button id="nextBtn" class="btn next">Next</button>
+    </div>
+    <div id="result"></div>
+  </div>
+
+<script>
+let questions = [];
+let answers = [];
+let current = 0;
+
+async function loadQuestions(){
+  const res = await fetch("http://localhost:5000/api/questions");
+  questions = await res.json();
+  answers = Array(questions.length).fill(null);
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q = questions[current];
+  const quizDiv = document.getElementById("quiz");
+  quizDiv.innerHTML = `
+    <div class="question">
+      <strong>Q${current+1}/${questions.length}:</strong> ${q.q}
+      <div class="options" id="opts"></div>
+    </div>
+  `;
+  const optsDiv = document.getElementById("opts");
+  q.opts.forEach((o,i)=>{
+    const btn = document.createElement("button");
+    btn.textContent = o;
+    if(answers[current]===o) btn.classList.add("selected");
+    btn.onclick = ()=>{
+      answers[current]=o;
+      document.querySelectorAll("#opts button").forEach(b=>b.classList.remove("selected"));
+      btn.classList.add("selected");
+    };
+    optsDiv.appendChild(btn);
+  });
+
+  document.getElementById("backBtn").style.display = current===0?"none":"inline-block";
+  document.getElementById("nextBtn").textContent = current===questions.length-1?"Finish":"Next";
+}
+
+document.getElementById("backBtn").onclick = ()=>{ if(current>0){current--;renderQuestion();} };
+document.getElementById("nextBtn").onclick = async ()=>{
+  if(!answers[current]){ alert("Please choose an option"); return; }
+  if(current<questions.length-1){ current++; renderQuestion(); }
+  else {
+    // Send to backend for AI flower match
+    const res = await fetch("/api/gemini", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ answers })
+      });
+    const j = await res.json();
+    document.getElementById("quiz").style.display="none";
+    document.getElementById("backBtn").style.display="none";
+    document.getElementById("nextBtn").style.display="none";
+    document.getElementById("result").innerHTML = `<h2>Your Cosmic Flower 🌸</h2><p>${j.text}</p>`;
+  }
+};
+
+loadQuestions();
+</script>
+</body>
+</html>
