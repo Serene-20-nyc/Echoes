@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Segreta | Login</title>
-    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="....css/login.css">
 </head>
 
 <body>
@@ -19,5 +19,27 @@
         </form>
     </div>
 </body>
+
+<script>
+    document.getElementById("loginForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const response = await fetch("/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                email: document.getElementById("email").value,
+                password: document.getElementById("password").value
+            })
+        });
+
+        const result = await response.json();
+        alert(result.message);
+
+        if (response.ok) {
+            window.location.href = "home.html"; // Redirect after login
+        }
+    });
+</script>
 
 </html>

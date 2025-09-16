@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session, redirect, url_for,render_template
+from flask import Flask, request, jsonify, session, redirect, url_for, render_template
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -18,8 +18,16 @@ class User(db.Model):
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(256), nullable=False)
 
-@app.route('/signup', methods=['POST'])
+# ---------- Routes ----------
+@app.route('/')
+def home():
+    return render_template("home.html")
+
+@app.route('/signup', methods=['GET', 'POST'])
 def signup():
+    if request.method == 'GET':
+        return render_template("signup.html")
+
     data = request.get_json()
     username = data.get('username')
     email = data.get('email')
@@ -36,13 +44,13 @@ def signup():
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({
-        'message': 'User created successfully!',
-        'user': {'username': new_user.username, 'email': new_user.email}
-    }), 201
+    return jsonify({'message': 'User created successfully!'}), 201
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'GET':
+        return render_template("login.html")
+
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
@@ -57,7 +65,7 @@ def login():
     session['user_id'] = user.id
     return jsonify({'message': 'Logged in successfully!'}), 200
 
-# Run the app
+# ---------- Create the database ----------
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
