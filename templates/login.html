@@ -5,17 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Segreta | Login</title>
-    <link rel="stylesheet" href="....css/login.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 
 <body>
     <div class="container">
         <h2>Login to Segreta</h2>
         <form id="loginForm">
-            <input type="username" placeholder="Email" id="username" required>
+            <input type="email" placeholder="Email" id="email" required>
             <input type="password" placeholder="Password" id="password" required>
             <button type="submit">Login</button>
-            <p>Don’t have an account? <a href="signup.html">Sign Up</a></p>
+            <p>Don’t have an account? <a href="{{ url_for('signup') }}">Sign Up</a></p>
         </form>
     </div>
 </body>
@@ -37,7 +37,7 @@
         alert(result.message);
 
         if (response.ok) {
-            window.location.href = "home.html"; // Redirect after login
+            window.location.href = "/"; // Redirect after login
         }
     });
 </script>
