@@ -8,6 +8,26 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden; /* prevent scrollbars interfering with centering */
+        }
+
+        /* Starry Background Canvas (fixed so it doesn't affect layout) */
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: black;
+        }
+
+        /* Cosmic Overlay (also fixed) */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255, 182, 193, 0.15), rgba(75, 0, 130, 0.4), rgba(0, 0, 0, 0.9));
+            z-index: -1;
         }
 
         @keyframes gradientBG {

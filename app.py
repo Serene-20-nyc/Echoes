@@ -9,6 +9,7 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from dotenv import load_dotenv
+from sqlalchemy import text
 
 # Load environment variables
 load_dotenv()
@@ -369,6 +370,10 @@ def resend_code():
 @app.route('/')
 def home():
     return render_template("home.html")
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
 @app.route('/login', methods=['GET'])
 def login_page():
@@ -897,6 +902,16 @@ def create_demo_data():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        # Ensure existing SQLite DBs have required columns
+        try:
+            cols = db.session.execute(text("PRAGMA table_info(user)")).fetchall()
+            col_names = {row[1] for row in cols}
+            if 'created_at' not in col_names:
+                db.session.execute(text("ALTER TABLE user ADD COLUMN created_at DATETIME"))
+                db.session.commit()
+                print("[MIGRATION] Added 'created_at' column to user table")
+        except Exception as e:
+            print(f"[MIGRATION] Skipped schema check or migration failed: {e}")
         create_demo_data()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=os.environ.get('FLASK_ENV') == 'development')
