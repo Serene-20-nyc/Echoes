@@ -40,9 +40,9 @@
 
             <div class="divider"><span>or continue with</span></div>
             <div class="social-buttons">
-                <button type="button" class="social google" aria-label="Log in with Google">Google</button>
-                <button type="button" class="social github" aria-label="Log in with GitHub">GitHub</button>
-                <button type="button" class="social facebook" aria-label="Log in with Facebook">Facebook</button>
+                <button type="button" class="social google" aria-label="Log in with Google" onclick="window.location.href='/oauth/google'">Google</button>
+                <button type="button" class="social github" aria-label="Log in with GitHub" onclick="window.location.href='/oauth/github'">GitHub</button>
+                <button type="button" class="social facebook" aria-label="Log in with Facebook" disabled title="Coming soon">Facebook</button>
             </div>
 
             <p>Don't have an account? <a href="{{ url_for('signup_page') }}">Sign Up</a></p>

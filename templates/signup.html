@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Segreta | Signup</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}">
+    {% if recaptcha_site_key %}
+    <script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}" async defer></script>
+    {% endif %}
 </head>
 
 <body>
@@ -60,9 +63,9 @@
 
             <div class="divider"><span>or sign up with</span></div>
             <div class="social-buttons">
-                <button type="button" class="social google" aria-label="Sign up with Google">Google</button>
-                <button type="button" class="social github" aria-label="Sign up with GitHub">GitHub</button>
-                <button type="button" class="social facebook" aria-label="Sign up with Facebook">Facebook</button>
+                <button type="button" class="social google" aria-label="Sign up with Google" onclick="window.location.href='/oauth/google'">Google</button>
+                <button type="button" class="social github" aria-label="Sign up with GitHub" onclick="window.location.href='/oauth/github'">GitHub</button>
+                <button type="button" class="social facebook" aria-label="Sign up with Facebook" disabled title="Coming soon">Facebook</button>
             </div>
 
             <p>Already have an account? <a href="{{ url_for('login_page') }}">Login</a></p>
@@ -130,21 +133,34 @@
             if (confirm && confirm !== password) return showError('Passwords do not match.');
             if (!terms) return showError('Please accept the Terms and Privacy Policy.');
 
-            try {
-                const response = await fetch('/signup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, email, password })
-                });
-                const result = await response.json();
-                alert(result.message);
-                if (response.ok) {
-                    if (result.redirect_url) window.location.href = result.redirect_url; else window.location.href = '/login';
-                } else {
-                    showError(result.message || 'Sign up failed. Please try again.');
+            const submitSignup = async (recaptcha_token) => {
+                try {
+                    const response = await fetch('/signup', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, email, password, recaptcha_token })
+                    });
+                    const result = await response.json();
+                    alert(result.message);
+                    if (response.ok) {
+                        if (result.redirect_url) window.location.href = result.redirect_url; else window.location.href = '/login';
+                    } else {
+                        showError(result.message || 'Sign up failed. Please try again.');
+                    }
+                } catch (err) {
+                    showError('Network error. Please try again.');
                 }
-            } catch (err) {
-                showError('Network error. Please try again.');
+            }
+
+            const siteKey = '{{ recaptcha_site_key|default("") }}';
+            if (siteKey) {
+                grecaptcha.ready(function() {
+                    grecaptcha.execute(siteKey, {action: 'signup'}).then(function(token) {
+                        submitSignup(token);
+                    }).catch(function(){ submitSignup(null); });
+                });
+            } else {
+                submitSignup(null);
             }
         });
     </script>

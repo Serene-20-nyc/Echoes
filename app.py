@@ -10,6 +10,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 from dotenv import load_dotenv
 from sqlalchemy import text
+from authlib.integrations.flask_client import OAuth
+import requests
+from flask_wtf import CSRFProtect
 
 # Load environment variables
 load_dotenv()
@@ -22,6 +25,36 @@ app.permanent_session_lifetime = datetime.timedelta(days=30)  # Support "Remembe
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///users.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+# OAuth configuration
+oauth = OAuth(app)
+
+# CSRF Protection (exempt JSON API endpoints using fetch)
+csrf = CSRFProtect(app)
+
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET:
+    oauth.register(
+        name='google',
+        client_id=GOOGLE_CLIENT_ID,
+        client_secret=GOOGLE_CLIENT_SECRET,
+        server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+        client_kwargs={'scope': 'openid email profile'}
+    )
+
+GITHUB_CLIENT_ID = os.environ.get('GITHUB_CLIENT_ID')
+GITHUB_CLIENT_SECRET = os.environ.get('GITHUB_CLIENT_SECRET')
+if GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET:
+    oauth.register(
+        name='github',
+        client_id=GITHUB_CLIENT_ID,
+        client_secret=GITHUB_CLIENT_SECRET,
+        access_token_url='https://github.com/login/oauth/access_token',
+        authorize_url='https://github.com/login/oauth/authorize',
+        api_base_url='https://api.github.com/',
+        client_kwargs={'scope': 'read:user user:email'}
+    )
 
 def is_demo_mode() -> bool:
     """Check if we're in demo mode (bypasses email verification)."""
@@ -382,14 +415,16 @@ def login_page():
 
 @app.route('/signup', methods=['GET'])
 def signup_page():
-    return render_template("signup.html")
+    return render_template("signup.html", recaptcha_site_key=os.environ.get('RECAPTCHA_SITE_KEY', ''))
 
+@csrf.exempt
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
+    recaptcha_token = data.get('recaptcha_token')
 
     if not all([username, email, password]):
         return jsonify({'message': 'Whispers of identity, contact, and secret must all be present'}), 400
@@ -399,6 +434,23 @@ def signup():
     email_pattern = r'^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,}$'
     if not re.match(email_pattern, email or ''):
         return jsonify({'message': 'Please enter a valid email address'}), 400
+
+    # Verify reCAPTCHA (v3) if configured
+    recaptcha_secret = os.environ.get('RECAPTCHA_SECRET')
+    if recaptcha_secret:
+        if not recaptcha_token:
+            return jsonify({'message': 'reCAPTCHA verification failed: token missing'}), 400
+        try:
+            resp = requests.post('https://www.google.com/recaptcha/api/siteverify', data={
+                'secret': recaptcha_secret,
+                'response': recaptcha_token
+            }, timeout=5)
+            payload = resp.json()
+            if not payload.get('success'):
+                return jsonify({'message': 'reCAPTCHA verification failed'}), 400
+        except Exception as e:
+            print(f"[ERROR] reCAPTCHA verification error: {e}")
+            return jsonify({'message': 'reCAPTCHA verification error'}), 400
 
     if User.query.filter_by(email=email).first() or User.query.filter_by(username=username).first():
         return jsonify({'message': 'User already exists!'}), 400
@@ -463,6 +515,85 @@ def signup():
             }
         }), 201
 
+# OAuth routes
+def _login_or_create_user(email: str, suggested_username: str = None):
+    user = User.query.filter_by(email=email).first()
+    if user:
+        session['user_id'] = user.id
+        return user, False
+    # Create new user (passwordless OAuth user)
+    base_username = suggested_username or (email.split('@')[0] if email else f'user{random.randint(1000,9999)}')
+    username = base_username
+    suffix = 1
+    while User.query.filter_by(username=username).first() is not None:
+        username = f"{base_username}{suffix}"
+        suffix += 1
+    user = User(username=username, email=email, password=generate_password_hash(secrets.token_urlsafe(16)))
+    db.session.add(user)
+    db.session.commit()
+    # Mark email as verified in our table, to skip code flow for OAuth
+    try:
+        ev = EmailVerification(email=email, code='oauth', expires_at=datetime.datetime.now(datetime.UTC), verified=True)
+        db.session.add(ev)
+        db.session.commit()
+    except Exception as e:
+        print(f"[WARN] Could not mark OAuth email verified: {e}")
+    session['user_id'] = user.id
+    return user, True
+
+@app.route('/oauth/google')
+def oauth_google():
+    if 'google' not in oauth._clients:
+        flash('Google OAuth is not configured')
+        return redirect(url_for('login_page'))
+    redirect_uri = url_for('oauth_google_callback', _external=True)
+    return oauth.google.authorize_redirect(redirect_uri)
+
+@app.route('/oauth/google/callback')
+def oauth_google_callback():
+    if 'google' not in oauth._clients:
+        flash('Google OAuth is not configured')
+        return redirect(url_for('login_page'))
+    token = oauth.google.authorize_access_token()
+    userinfo = oauth.google.parse_id_token(token)
+    email = userinfo.get('email') if userinfo else None
+    if not email:
+        flash('Failed to retrieve email from Google')
+        return redirect(url_for('login_page'))
+    _login_or_create_user(email)
+    return redirect(url_for('dashboard'))
+
+@app.route('/oauth/github')
+def oauth_github():
+    if 'github' not in oauth._clients:
+        flash('GitHub OAuth is not configured')
+        return redirect(url_for('login_page'))
+    redirect_uri = url_for('oauth_github_callback', _external=True)
+    return oauth.github.authorize_redirect(redirect_uri)
+
+@app.route('/oauth/github/callback')
+def oauth_github_callback():
+    if 'github' not in oauth._clients:
+        flash('GitHub OAuth is not configured')
+        return redirect(url_for('login_page'))
+    token = oauth.github.authorize_access_token()
+    resp = oauth.github.get('user', token=token)
+    data = resp.json()
+    email = data.get('email')
+    # GitHub may not return primary email in /user; fetch separately
+    if not email:
+        emails_resp = oauth.github.get('user/emails', token=token)
+        emails = emails_resp.json() if emails_resp else []
+        primary = next((e for e in emails if e.get('primary') and e.get('verified')), None)
+        email = primary.get('email') if primary else (emails[0]['email'] if emails else None)
+    if not email:
+        flash('Failed to retrieve email from GitHub')
+        return redirect(url_for('login_page'))
+    suggested = data.get('login')
+    _login_or_create_user(email, suggested_username=suggested)
+    return redirect(url_for('dashboard'))
+
+@csrf.exempt
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -534,6 +665,7 @@ def get_secrets():
     secrets = Secret.query.order_by(Secret.created_at.desc()).all()
     return jsonify([secret.to_dict() for secret in secrets])
 
+@csrf.exempt
 @app.route('/api/secrets', methods=['POST'])
 def create_secret():
     print(f"[DEBUG] Create secret called - Session: {session}")
@@ -616,6 +748,7 @@ def handle_500(e):
 def forgot_password_page():
     return render_template('forgot_password.html')
 
+@csrf.exempt
 @app.route('/forgot-password', methods=['POST'])
 def forgot_password():
     data = request.get_json()
@@ -685,6 +818,7 @@ def reset_password_page():
     
     return render_template('reset_password.html', token=token)
 
+@csrf.exempt
 @app.route('/reset-password', methods=['POST'])
 def reset_password():
     data = request.get_json()
@@ -752,6 +886,7 @@ def get_quiz_questions():
     ]
     return jsonify(questions)
 
+@csrf.exempt
 @app.route('/api/gemini', methods=['POST'])
 def cosmic_flower_match():
     """AI-powered flower personality matching based on quiz answers"""
