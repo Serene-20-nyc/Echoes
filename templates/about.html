@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>About – Echoes of Love</title>
+  <!--<link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}" />-->
+  <style>
+      body {
+          margin: 0;
+          font-family: "Poppins", sans-serif;
+          background: linear-gradient(135deg, #ffb6c1, black, #1c1c3c);
+          background-size: 400% 400%;
+          animation: gradientBG 15s ease infinite;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100vh;
+      }
+
+      @keyframes gradientBG {
+          0% {
+              background-position: 0% 50%;
+          }
+
+          50% {
+              background-position: 100% 50%;
+          }
+
+          100% {
+              background-position: 0% 50%;
+          }
+      }
+
+      .about-container {
+          background: rgba(255, 255, 255, 0.1);
+          backdrop-filter: blur(10px);
+          border-radius: 20px;
+          padding: 40px;
+          width: 350px;
+          text-align: center;
+          color: #fff;
+          box-shadow: 0 0 20px rgba(255, 182, 193, 0.7);
+      }
+
+      h1 {
+          margin-bottom: 20px;
+          font-size: 26px;
+          color: #ffe4f5;
+      }
+
+      p {
+          margin: 10px 0;
+          line-height: 1.6;
+      }
+  </style>
+</head>
+<body>
+  <div class="about-container">
+    <h1>About Echoes of Love 🌌</h1>
+    <p>
+      In a world that often rushes past feeling, <strong>Echoes of Love</strong> is a gentle pause—a place where emotion blooms like a flower in moonlight. This project is a cosmic garden of reflection, where each petal holds a whisper of who you are.
+    </p>
+    <p>
+      Born from the union of poetic design and generative intelligence, Echoes invites you to explore your inner universe through a constellation of questions. With every answer, a flower emerges—your floral mirror, shaped by love, memory, and stardust.
+    </p>
+    <p>
+      Whether you're here to wander, to wonder, or to simply feel seen, Segreta welcomes you. May your journey through these echoes be soft, stirring, and beautifully strange.
+    </p>
+    <div class="signature">
+      <em>— Segreta</em>
+    </div>
+  </div>
+</body>
+</html>

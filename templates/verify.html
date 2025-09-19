@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Verify Your Email</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/verify.css') }}">
+    <style>
+        .message-container {
+            margin: 20px 0;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 10px 0;
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.6);
+            color: #ffd700;
+            text-align: center;
+        }
+
+        .resend-section {
+            text-align: center;
+            margin: 20px 0;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .resend-link {
+            color: #FFD700;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .resend-link:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .back-link a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .back-link a:hover {
+            color: #FFD700;
+            text-decoration: underline;
+        }
+
+        #codeInput {
+            text-align: center;
+            font-size: 1.2em;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Starry Canvas Background -->
+    <canvas id="stars"></canvas>
+
+    <!-- Overlay Gradient -->
+    <div class="overlay"></div>
+
+    <div class="container">
+        <h1>Verify Your Email</h1>
+        <p>We sent a 6-digit code to <strong>{{ email }}</strong></p>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="message-container">
+            {% for message in messages %}
+            <div class="message">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('verify_email') }}" method="post" id="verifyForm">
+            <input type="hidden" name="email" value="{{ email }}">
+            <input type="text" name="code" placeholder="Enter 6-digit code" maxlength="6" pattern="[0-9]{6}" required
+                id="codeInput">
+            <button type="submit" id="verifyBtn">Verify Email</button>
+        </form>
+
+        <div class="resend-section">
+            <p>Didn't receive the code?</p>
+            <a href="{{ url_for('resend_code', email=email) }}" class="resend-link" id="resendLink">Resend Code</a>
+        </div>
+
+        <div class="back-link">
+            <a href="{{ url_for('login_page') }}">← Back to Login</a>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+</body>
+
+</html>

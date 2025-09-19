@@ -1,14 +1,19 @@
-// Navbar Toggle
+// Navbar Toggle (only if elements exist)
 const toggle = document.getElementById("menu-toggle");
 const navLinks = document.querySelector(".nav-links");
 
-toggle.addEventListener("click", () => {
-  navLinks.classList.toggle("active");
-});
+if (toggle && navLinks) {
+  toggle.addEventListener("click", () => {
+    navLinks.classList.toggle("active");
+  });
+}
 
-// Starry Background
+// Starry Background (only if canvas exists)
 const canvas = document.getElementById("stars");
-const ctx = canvas.getContext("2d");
+if (!canvas) {
+  console.log("No stars canvas found, skipping animation");
+} else {
+  const ctx = canvas.getContext("2d");
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -40,3 +45,4 @@ function animateStars() {
   requestAnimationFrame(animateStars);
 }
 animateStars();
+}

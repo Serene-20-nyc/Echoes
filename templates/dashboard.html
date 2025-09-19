@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Segreta | Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Starry Canvas Background -->
+    <canvas id="stars"></canvas>
+
+    <!-- Overlay Gradient -->
+    <div class="overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="brand">Segreta</div>
+        <div class="nav-right">
+            <a href="{{ url_for('quiz') }}" class="nav-link">
+                <i class="fas fa-star"></i> Quiz
+            </a>
+            <span class="welcome">Welcome, {{ user.username }}</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% if not is_verified %}
+        <div class="verify-banner" style="
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.6);
+            color: #ffd700;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin: 10px auto 20px;
+            max-width: 900px;
+            display: flex;
+            align-items: center;
+            gap: 10px;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+                <strong>Email not verified.</strong>
+                Please <a href="{{ url_for('verify_page', email=user.email) }}"
+                    style="color:#fff; text-decoration: underline;">verify your email</a>
+                to post secrets and access all features. Need a new code?
+                <a href="{{ url_for('resend_code', email=user.email) }}"
+                    style="color:#fff; text-decoration: underline;">Resend code</a>.
+            </div>
+        </div>
+        {% endif %}
+        <!-- Create Secret Section -->
+        <section class="create-section">
+            <h2><i class="fas fa-feather-alt"></i> Share Your Secret</h2>
+            <form id="secretForm" class="secret-form">
+                <input type="text" id="title" placeholder="Give your secret a title..." required>
+                <textarea id="content" placeholder="Pour your heart out..." required></textarea>
+                <div class="form-options">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="anonymous">
+                        <span class="checkmark"></span>
+                        Share anonymously
+                    </label>
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i> Share Secret
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Secrets Feed -->
+        <section class="feed-section">
+            <h2><i class="fas fa-heart"></i> Whispers from the Cosmos</h2>
+            <div id="secretsFeed" class="secrets-feed">
+                <!-- Secrets will be loaded here -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Floating particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+
+</html>

@@ -9,17 +9,25 @@
 </head>
 
 <body>
+    <!-- Starry Canvas Background -->
+    <canvas id="stars"></canvas>
+    
+    <!-- Overlay Gradient -->
+    <div class="overlay"></div>
+    
     <div class="container">
         <h2>Login to Segreta</h2>
         <form id="loginForm">
             <input type="email" placeholder="Email" id="email" required>
             <input type="password" placeholder="Password" id="password" required>
             <button type="submit">Login</button>
-            <p>Don’t have an account? <a href="{{ url_for('signup') }}">Sign Up</a></p>
+            <p>Don't have an account? <a href="{{ url_for('signup_page') }}">Sign Up</a></p>
+            <p><a href="{{ url_for('forgot_password_page') }}" style="color: #FFD700; font-size: 0.9em;">Forgot your password?</a></p>
         </form>
     </div>
 </body>
 
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script>
     document.getElementById("loginForm").addEventListener("submit", async function (e) {
         e.preventDefault();
@@ -37,7 +45,10 @@
         alert(result.message);
 
         if (response.ok) {
-            window.location.href = "/"; // Redirect after login
+            window.location.href = "/dashboard"; // Redirect after login
+        } else if (response.status === 403 && result.redirect_url) {
+            // Not verified: redirect to verification page
+            window.location.href = result.redirect_url;
         }
     });
 </script>

@@ -19,13 +19,13 @@
     <nav class="navbar">
         <div class="brand">Segreta</div>
         <ul class="nav-links">
-            <li><a href="{{ url_for('home') }}">Home</a></li>
-            <li><a href="{{ url_for('about') }}">About</a></li>
-            <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
-            <li><a href="{{ url_for('contact') }}">Contact</a></li>
+            <li><a href="#">Home</a></li>
             <li><a href="{{ url_for('quiz') }}">Quiz</a></li>
-            <li><button class="btn"><a href="{{ url_for('login') }}">Login</a></button></li>
-            <li><button class="btn signup"><a href="{{ url_for('signup') }}">Sign Up</a></button></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Gallery</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><button class="btn"><a href="{{ url_for('login_page') }}">Login</a></button></li>
+            <li><button class="btn signup"><a href="{{ url_for('signup_page') }}">Sign Up</a></button></li>
         </ul>
         <div class="menu-toggle" id="menu-toggle">&#9776;</div>
     </nav>
@@ -38,15 +38,15 @@
     </section>
 
     <!-- Floating Cosmic Elements -->
-    <!-- <img src="{{ url_for('static', filename='img/floating-flower.png') }}" alt="flower" class="floating flower" /> -->
-    <!-- <img src="{{ url_for('static', filename='img/floating-heart.png') }}" alt="heart" class="floating heart" /> -->
+    <img src="floating-flower.png" alt="flower" class="floating flower" />
+    <img src="floating-heart.png" alt="heart" class="floating heart" />
 
     <!-- Background Music -->
-    <!-- <audio autoplay loop id="bg-music">
-        <source src="{{ url_for('static', filename='audio/calm-tune.mp3') }}" type="audio/mp3">
-    </audio> -->
+    <audio autoplay loop id="bg-music">
+        <source src="calm-tune.mp3" type="audio/mp3">
+    </audio>
 
-    <script src="{{ url_for('static', filename='home.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 </body>
 
 </html>

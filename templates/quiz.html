@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Segreta | Cosmic Flower Quiz</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Starry Canvas Background -->
+    <canvas id="stars"></canvas>
+
+    <!-- Overlay Gradient -->
+    <div class="overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="brand">Segreta</div>
+        <div class="nav-right">
+            <a href="{{ url_for('home') }}" class="nav-link">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="nav-link">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Quiz Header -->
+        <div class="quiz-header">
+            <h1><i class="fas fa-star"></i> Cosmic Flower Personality Quiz</h1>
+            <p class="subtitle">Discover which cosmic flower resonates with your soul</p>
+        </div>
+
+        <!-- Quiz Container -->
+        <div id="quizContainer" class="quiz-container">
+            <!-- Start Screen -->
+            <div id="startScreen" class="screen active">
+                <div class="start-content">
+                    <div class="cosmic-icon">🌸✨</div>
+                    <h2>Journey into the Cosmic Garden</h2>
+                    <p>In the vast expanse of the universe, each soul resonates with a unique cosmic flower. This
+                        mystical quiz will reveal which celestial bloom mirrors your inner essence.</p>
+                    <p>Answer 5 questions from the depths of your heart, and discover your cosmic flower identity.</p>
+                    <button id="startQuiz" class="cosmic-btn">
+                        <i class="fas fa-rocket"></i> Begin Your Journey
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div id="quizScreen" class="screen">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                    <span id="questionCounter" class="question-counter">1 / 5</span>
+                </div>
+
+                <div class="question-container">
+                    <h2 id="questionText" class="question-text"></h2>
+                    <div id="optionsContainer" class="options-container">
+                        <!-- Options will be populated here -->
+                    </div>
+                </div>
+
+                <div class="quiz-navigation">
+                    <button id="prevBtn" class="nav-btn" disabled>
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <button id="nextBtn" class="nav-btn" disabled>
+                        Next <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div id="resultsScreen" class="screen">
+                <div class="results-content">
+                    <div class="loading-animation" id="loadingAnimation">
+                        <div class="cosmic-spinner"></div>
+                        <p>Consulting the cosmic energies...</p>
+                    </div>
+
+                    <div id="resultsContent" class="results-display" style="display: none;">
+                        <div class="result-header">
+                            <h2>Your Cosmic Flower</h2>
+                        </div>
+                        <div id="flowerResult" class="flower-result">
+                            <!-- AI result will be populated here -->
+                        </div>
+                        <div class="result-actions">
+                            <button id="retakeQuiz" class="cosmic-btn secondary">
+                                <i class="fas fa-redo"></i> Take Quiz Again
+                            </button>
+                            <button id="shareResult" class="cosmic-btn">
+                                <i class="fas fa-share"></i> Share Your Flower
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating particles -->
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
+</body>
+
+</html>
