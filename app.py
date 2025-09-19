@@ -16,6 +16,7 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-change-in-production-' + os.urandom(24).hex())
+app.permanent_session_lifetime = datetime.timedelta(days=30)  # Support "Remember me" sessions
 
 # Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///users.db')
@@ -393,6 +394,12 @@ def signup():
     if not all([username, email, password]):
         return jsonify({'message': 'Whispers of identity, contact, and secret must all be present'}), 400
 
+    # Server-side email format validation
+    import re
+    email_pattern = r'^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,}$'
+    if not re.match(email_pattern, email or ''):
+        return jsonify({'message': 'Please enter a valid email address'}), 400
+
     if User.query.filter_by(email=email).first() or User.query.filter_by(username=username).first():
         return jsonify({'message': 'User already exists!'}), 400
 
@@ -461,6 +468,7 @@ def login():
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
+    remember = bool(data.get('remember', False))
 
     if not all([email, password]):
         return jsonify({'message': 'Both email and secret must be present'}), 400
@@ -508,6 +516,8 @@ def login():
         }), 403
 
     session['user_id'] = user.id
+    # Apply remember-me preference
+    session.permanent = remember
     return jsonify({'message': 'Logged in successfully!'}), 200
 
 @app.route('/dashboard')

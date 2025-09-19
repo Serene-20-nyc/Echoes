@@ -1,108 +1,246 @@
-        body {
-            margin: 0;
-            font-family: "Poppins", sans-serif;
-            background: linear-gradient(135deg, #ffb6c1, black, #1c1c3c);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden; /* prevent scrollbars interfering with centering */
-        }
+/* ============================
+   Signup Page - Floral Soothing Theme
+   ============================ */
 
-        /* Starry Background Canvas (fixed so it doesn't affect layout) */
-        #stars {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            background: black;
-        }
-
-        /* Cosmic Overlay (also fixed) */
-        .overlay {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at center, rgba(255, 182, 193, 0.15), rgba(75, 0, 130, 0.4), rgba(0, 0, 0, 0.9));
-            z-index: -1;
-        }
-
-        @keyframes gradientBG {
-            0% {
-                background-position: 0% 50%;
-            }
-
-            50% {
-                background-position: 100% 50%;
-            }
-
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            width: 350px;
-            text-align: center;
-            color: #fff;
-            box-shadow: 0 0 20px rgba(255, 182, 193, 0.7);
-        }
-
-        h2 {
-            margin-bottom: 20px;
-            font-size: 26px;
-            color: #ffe4f5;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            font-size: 16px;
-        }
-
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        button {
-            margin-top: 15px;
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 12px;
-            background: linear-gradient(90deg, #ff69b4, #ba55d3);
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: linear-gradient(90deg, #ba55d3, #ff69b4);
-        }
-
-        p {
-            margin-top: 15px;
-            font-size: 14px;
-        }
-
-        p a {
-            color: #ffe4f5;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        p a:hover {
-            text-decoration: underline;
-        }
+/* Body & background */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Poppins", sans-serif;
+    color: #3a3a3a;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    overflow-x: hidden;
+    position: relative;
+  }
+  
+  /* Background layers */
+  canvas#stars,
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+  
+  /* Signup container */
+  .container {
+    max-width: 450px;
+    width: 100%;
+    padding: 2.5rem 2rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 24px rgba(100, 80, 60, 0.15);
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  }
+  
+  /* Header */
+  .container h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: #4d3b2f;
+    font-weight: 600;
+  }
+  
+  /* Grid 2 layout */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  
+  /* Labels left-aligned */
+  form label {
+    display: block;
+    text-align: left;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #4d3b2f;
+  }
+  
+  /* Inputs */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    border: 1px solid #d8c9c0;
+    background: #fdfdfd;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+  }
+  
+  input:focus {
+    border-color: #a9c6a9;
+    outline: none;
+    box-shadow: 0 0 6px rgba(169, 198, 169, 0.4);
+  }
+  
+  /* Input groups with toggle */
+  .input-group {
+    position: relative;
+  }
+  
+  .toggle-visibility {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6a6a6a;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+  
+  /* Password hint & strength */
+  .hint {
+    font-size: 0.8rem;
+    color: #6a6a6a;
+    margin-bottom: 0.5rem;
+    text-align: left;
+  }
+  
+  .strength {
+    height: 10px;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    display: none;
+    color: #fff;
+    font-size: 0.75rem;
+    text-align: center;
+    line-height: 1.5;
+  }
+  
+  /* Checkbox */
+  .checkbox {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+  
+  .checkbox input {
+    margin-right: 8px;
+  }
+  
+  /* Error Box */
+  .error {
+    background: #ffe5e5;
+    color: #a94442;
+    padding: 0.6rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    border: 1px solid #f5c2c2;
+  }
+  
+  /* Primary Button */
+  .primary-btn {
+    background: linear-gradient(135deg, #a9c6a9, #d8bfa6);
+    color: #fff;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+  }
+  
+  .primary-btn:hover {
+    background: linear-gradient(135deg, #94b594, #cfa98d);
+    box-shadow: 0 6px 16px rgba(140, 120, 100, 0.25);
+  }
+  
+  /* Divider */
+  .divider {
+    margin: 1.5rem 0;
+    font-size: 0.85rem;
+    color: #8a7e76;
+    position: relative;
+  }
+  
+  .divider span {
+    background: #fff;
+    padding: 0 10px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 1px;
+    width: 100%;
+    background: #d6ccc2;
+    z-index: 0;
+  }
+  
+  /* Social Buttons */
+  .social-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+  }
+  
+  .social {
+    flex: 1;
+    padding: 10px;
+    margin: 0 5px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-align: center;
+    color: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .social.google { background: #e57373; }
+  .social.github { background: #6a6a6a; }
+  .social.facebook { background: #6c8ebf; }
+  
+  .social:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(90, 70, 50, 0.2);
+  }
+  
+  /* Footer Links */
+  .container p {
+    font-size: 0.9rem;
+    color: #5a4d45;
+  }
+  
+  .container p a {
+    color: #7a9a7e;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .container p a:hover {
+    color: #5e8362;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 500px) {
+    .grid-2 {
+      grid-template-columns: 1fr;
+    }
+  }
+  

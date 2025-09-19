@@ -1,92 +1,228 @@
+/* ============================
+   Login Page - Floral Soothing Theme
+   ============================ */
+
+/* Body as flexbox container */
 body {
     margin: 0;
+    padding: 0;
     font-family: "Poppins", sans-serif;
-    background: black;
+    color: #3a3a3a;
+    min-height: 100vh; /* Ensure full height */
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    justify-content: center; /* Horizontal center */
+    align-items: center;     /* Vertical center */
+    background: transparent;
+    position: relative;
     overflow: hidden;
-}
-
-/* Starry Background Canvas */
-#stars {
+  }
+  
+  /* Container stays neatly centered */
+  .container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 3rem 2.5rem;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(90, 70, 50, 0.15);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(200, 180, 160, 0.3);
+    position: relative; /* ensure it's above canvas/overlay */
+    z-index: 2;
+  }
+  
+  /* Keep background elements behind */
+  canvas#stars,
+  .overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -2;
-    background: black;
-}
-
-/* Cosmic Overlay */
-.overlay {
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(circle at center, rgba(255, 182, 193, 0.15), rgba(75, 0, 130, 0.4), rgba(0, 0, 0, 0.9));
-    z-index: -1;
-}
-
-.container {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 40px;
-    width: 350px;
-    text-align: center;
+    z-index: 0;
+  }
+    
+  .container h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    color: #4d3b2f;
+    font-weight: 600;
+  }
+  
+  /* Inputs */
+  /* Form labels aligned left */
+form label {
+    display: block;
+    text-align: left;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #4d3b2f; /* soft earthy tone */
+  }
+  
+  /* Adjust input spacing since labels are visible */
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 1.2rem; /* more spacing for clarity */
+    border-radius: 10px;
+    border: 1px solid #d8c9c0;
+    background: #fdfdfd;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+  }
+  
+  
+  input[type="email"]:focus,
+  input[type="password"]:focus {
+    border-color: #a9c6a9;
+    outline: none;
+    box-shadow: 0 0 6px rgba(169, 198, 169, 0.4);
+  }
+  
+  /* Password input with toggle */
+  .input-group {
+    position: relative;
+  }
+  
+  .toggle-visibility {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6a6a6a;
+    cursor: pointer;
+    font-size: 0.85rem;
+  }
+  
+  /* Form Row */
+  .form-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0.8rem 0 1.2rem;
+    font-size: 0.9rem;
+  }
+  
+  .form-row a {
+    color: #7a9a7e;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .form-row a:hover {
+    color: #5e8362;
+  }
+  
+  /* Error Box */
+  .error {
+    background: #ffe5e5;
+    color: #a94442;
+    padding: 0.6rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    border: 1px solid #f5c2c2;
+  }
+  
+  /* Primary Button */
+  .primary-btn {
+    background: linear-gradient(135deg, #a9c6a9, #d8bfa6);
     color: #fff;
-    box-shadow: 0 0 20px rgba(255, 182, 193, 0.7);
-}
-
-        h2 {
-            margin-bottom: 20px;
-            font-size: 26px;
-            color: #ffe4f5;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            font-size: 16px;
-        }
-
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        button {
-            margin-top: 15px;
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 12px;
-            background: linear-gradient(90deg, #ff69b4, #ba55d3);
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: linear-gradient(90deg, #ba55d3, #ff69b4);
-        }
-
-        p {
-            margin-top: 15px;
-            font-size: 14px;
-        }
-
-        p a {
-            color: #ffe4f5;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        p a:hover {
-            text-decoration: underline;
-        }
+    border: none;
+    padding: 12px;
+    width: 100%;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .primary-btn:hover {
+    background: linear-gradient(135deg, #94b594, #cfa98d);
+    box-shadow: 0 6px 16px rgba(140, 120, 100, 0.25);
+  }
+  
+  /* Divider */
+  .divider {
+    margin: 1.5rem 0;
+    font-size: 0.85rem;
+    color: #8a7e76;
+    position: relative;
+  }
+  
+  .divider span {
+    background: #fff;
+    padding: 0 10px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 1px;
+    width: 100%;
+    background: #d6ccc2;
+    z-index: 0;
+  }
+  
+  /* Social Buttons */
+  .social-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+  }
+  
+  .social {
+    flex: 1;
+    padding: 10px;
+    margin: 0 5px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    color: #fff;
+  }
+  
+  .social.google {
+    background: #e57373;
+  }
+  
+  .social.github {
+    background: #6a6a6a;
+  }
+  
+  .social.facebook {
+    background: #6c8ebf;
+  }
+  
+  .social:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(90, 70, 50, 0.2);
+  }
+  
+  /* Footer Links */
+  .container p {
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    color: #5a4d45;
+  }
+  
+  .container p a {
+    color: #7a9a7e;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .container p a:hover {
+    color: #5e8362;
+  }
+  

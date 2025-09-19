@@ -16,41 +16,103 @@
     <div class="overlay"></div>
     
     <div class="container">
-        <h2>Login to Segreta</h2>
-        <form id="loginForm">
-            <input type="email" placeholder="Email" id="email" required>
-            <input type="password" placeholder="Password" id="password" required>
-            <button type="submit">Login</button>
+        <h2>Log in to Segreta</h2>
+        <form id="loginForm" novalidate>
+            <label for="email">Email</label>
+            <input type="email" placeholder="Email" id="email" name="email" autocomplete="email" required autofocus>
+
+            <div class="input-group">
+                <label for="password" >Password</label>
+                <input type="password" placeholder="Password" id="password" name="password" autocomplete="current-password" required>
+                <button type="button" class="toggle-visibility" aria-label="Show password" id="togglePassword">Show</button>
+            </div>
+
+            <div class="form-row">
+                <label class="checkbox">
+                    <input type="checkbox" id="rememberMe"> Remember me
+                </label>
+                <a href="{{ url_for('forgot_password_page') }}" class="link">Forgot password?</a>
+            </div>
+
+            <div id="errorBox" class="error" role="alert" style="display:none;"></div>
+
+            <button type="submit" class="primary-btn">Log In</button>
+
+            <div class="divider"><span>or continue with</span></div>
+            <div class="social-buttons">
+                <button type="button" class="social google" aria-label="Log in with Google">Google</button>
+                <button type="button" class="social github" aria-label="Log in with GitHub">GitHub</button>
+                <button type="button" class="social facebook" aria-label="Log in with Facebook">Facebook</button>
+            </div>
+
             <p>Don't have an account? <a href="{{ url_for('signup_page') }}">Sign Up</a></p>
-            <p><a href="{{ url_for('forgot_password_page') }}" style="color: #FFD700; font-size: 0.9em;">Forgot your password?</a></p>
         </form>
     </div>
-</body>
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+    <script>
+        const emailEl = document.getElementById('email');
+        const passwordEl = document.getElementById('password');
+        const errorBox = document.getElementById('errorBox');
+        const toggleBtn = document.getElementById('togglePassword');
 
-<script src="{{ url_for('static', filename='js/home.js') }}"></script>
-<script>
-    document.getElementById("loginForm").addEventListener("submit", async function (e) {
-        e.preventDefault();
+        function showError(msg) {
+            errorBox.textContent = msg;
+            errorBox.style.display = 'block';
+        }
+        function clearError() {
+            errorBox.textContent = '';
+            errorBox.style.display = 'none';
+        }
+        function isValidEmail(v) {
+            return /^[\w.-]+@[\w.-]+\.[A-Za-z]{2,}$/.test(v);
+        }
 
-        const response = await fetch("/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                email: document.getElementById("email").value,
-                password: document.getElementById("password").value
-            })
+        emailEl.addEventListener('blur', () => {
+            if (emailEl.value && !isValidEmail(emailEl.value)) {
+                showError('Please enter a valid email address.');
+            } else {
+                clearError();
+            }
         });
 
-        const result = await response.json();
-        alert(result.message);
+        toggleBtn.addEventListener('click', () => {
+            const isPwd = passwordEl.type === 'password';
+            passwordEl.type = isPwd ? 'text' : 'password';
+            toggleBtn.textContent = isPwd ? 'Hide' : 'Show';
+            toggleBtn.setAttribute('aria-label', isPwd ? 'Hide password' : 'Show password');
+        });
 
-        if (response.ok) {
-            window.location.href = "/dashboard"; // Redirect after login
-        } else if (response.status === 403 && result.redirect_url) {
-            // Not verified: redirect to verification page
-            window.location.href = result.redirect_url;
-        }
-    });
-</script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearError();
+            const email = emailEl.value.trim();
+            const password = passwordEl.value;
+            if (!email || !password) {
+                return showError('Please fill in both email and password.');
+            }
+            if (!isValidEmail(email)) {
+                return showError('Please enter a valid email address.');
+            }
 
-</html>
+            const remember = document.getElementById('rememberMe').checked;
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, remember })
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    window.location.href = '/dashboard';
+                } else if (response.status === 403 && result.redirect_url) {
+                    window.location.href = result.redirect_url;
+                } else {
+                    showError(result.message || 'Login failed. Please try again.');
+                }
+            } catch (err) {
+                showError('Network error. Please try again.');
+            }
+        });
+    </script>
+    </body>
+    </html>

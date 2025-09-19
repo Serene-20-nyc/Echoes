@@ -16,47 +16,137 @@
     <div class="overlay"></div>
 
     <div class="container">
-        <h2>Sign Up for Segreta</h2>
-        <form id="signupForm">
-            <p class="title">Username:</p>
-            <input type="text" placeholder="Username" id="username" required>
-            <p class="title">Email:</p>
-            <input type="email" placeholder="Email" id="email" required>
-            <p class="title">Password:</p>
-            <input type="password" placeholder="Password" id="password" required>
-            <button type="submit">Sign Up</button>
+        <h2>Create your account</h2>
+        <form id="signupForm" novalidate>
+            <div class="grid-2">
+                <div>
+                    <label for="firstName" class="sr-only">First name (optional)</label>
+                    <input type="text" id="firstName" placeholder="First name (optional)">
+                </div>
+                <div>
+                    <label for="lastName" class="sr-only">Last name (optional)</label>
+                    <input type="text" id="lastName" placeholder="Last name (optional)">
+                </div>
+            </div>
+
+            <label for="username" class="sr-only">Username</label>
+            <input type="text" placeholder="Username" id="username" required autocomplete="username" autofocus>
+
+            <label for="email" class="sr-only">Email</label>
+            <input type="email" placeholder="Email" id="email" required autocomplete="email">
+
+            <div class="input-group">
+                <label for="password" class="sr-only">Password</label>
+                <input type="password" placeholder="Password" id="password" required autocomplete="new-password" aria-describedby="pwdHelp">
+                <button type="button" class="toggle-visibility" aria-label="Show password" id="togglePassword">Show</button>
+            </div>
+            <div id="pwdHelp" class="hint">Use 6+ chars with a mix of letters and numbers.</div>
+            <div class="strength" id="pwdStrength" aria-hidden="true"></div>
+
+            <div class="input-group">
+                <label for="confirm" class="sr-only">Confirm Password</label>
+                <input type="password" placeholder="Confirm password" id="confirm" autocomplete="new-password">
+                <button type="button" class="toggle-visibility" aria-label="Show password" id="toggleConfirm">Show</button>
+            </div>
+
+            <div id="errorBox" class="error" role="alert" style="display:none;"></div>
+
+            <label class="checkbox">
+                <input type="checkbox" id="terms" required>
+                I agree to the <a href="#" class="link">Terms</a> and <a href="#" class="link">Privacy Policy</a>
+            </label>
+
+            <button type="submit" class="primary-btn">Create Account</button>
+
+            <div class="divider"><span>or sign up with</span></div>
+            <div class="social-buttons">
+                <button type="button" class="social google" aria-label="Sign up with Google">Google</button>
+                <button type="button" class="social github" aria-label="Sign up with GitHub">GitHub</button>
+                <button type="button" class="social facebook" aria-label="Sign up with Facebook">Facebook</button>
+            </div>
+
             <p>Already have an account? <a href="{{ url_for('login_page') }}">Login</a></p>
         </form>
     </div>
-</body>
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+    <script>
+        const emailEl = document.getElementById('email');
+        const usernameEl = document.getElementById('username');
+        const pwdEl = document.getElementById('password');
+        const confirmEl = document.getElementById('confirm');
+        const errorBox = document.getElementById('errorBox');
+        const strengthEl = document.getElementById('pwdStrength');
+        const togglePwd = document.getElementById('togglePassword');
+        const toggleCfm = document.getElementById('toggleConfirm');
 
-<script src="{{ url_for('static', filename='js/home.js') }}"></script>
-<script>
-    document.getElementById("signupForm").addEventListener("submit", async function (e) {
-        e.preventDefault();
+        function showError(msg) { errorBox.textContent = msg; errorBox.style.display = 'block'; }
+        function clearError() { errorBox.textContent = ''; errorBox.style.display = 'none'; }
+        function isValidEmail(v) { return /^[\w.-]+@[\w.-]+\.[A-Za-z]{2,}$/.test(v); }
+        function pwStrength(p) {
+            let score = 0;
+            if (p.length >= 6) score++;
+            if (/[A-Z]/.test(p)) score++;
+            if (/[0-9]/.test(p)) score++;
+            if (/[^A-Za-z0-9]/.test(p)) score++;
+            return score; // 0-4
+        }
+        function renderStrength(score) {
+            const labels = ['Very weak', 'Weak', 'Fair', 'Good', 'Strong'];
+            const colors = ['#ff7070', '#ffa070', '#ffd070', '#c0f0a0', '#90e0c0'];
+            strengthEl.style.display = 'block';
+            strengthEl.textContent = labels[score];
+            strengthEl.style.background = 'linear-gradient(90deg, ' + colors[Math.max(0, score-1)] + ', rgba(255,255,255,0.1))';
+        }
 
-        const response = await fetch("/signup", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                username: document.getElementById("username").value,
-                email: document.getElementById("email").value,
-                password: document.getElementById("password").value
-            })
+        emailEl.addEventListener('blur', () => {
+            if (emailEl.value && !isValidEmail(emailEl.value)) showError('Please enter a valid email address.');
+            else clearError();
+        });
+        pwdEl.addEventListener('input', () => { renderStrength(pwStrength(pwdEl.value)); });
+
+        togglePwd.addEventListener('click', () => {
+            const s = pwdEl.type === 'password'; pwdEl.type = s ? 'text' : 'password';
+            togglePwd.textContent = s ? 'Hide' : 'Show';
+            togglePwd.setAttribute('aria-label', s ? 'Hide password' : 'Show password');
+        });
+        toggleCfm.addEventListener('click', () => {
+            const s = confirmEl.type === 'password'; confirmEl.type = s ? 'text' : 'password';
+            toggleCfm.textContent = s ? 'Hide' : 'Show';
+            toggleCfm.setAttribute('aria-label', s ? 'Hide password' : 'Show password');
         });
 
-        const result = await response.json();
-        alert(result.message);
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearError();
+            const username = usernameEl.value.trim();
+            const email = emailEl.value.trim();
+            const password = pwdEl.value;
+            const confirm = confirmEl.value;
+            const terms = document.getElementById('terms').checked;
 
-        if (response.ok) {
-            if (result.redirect_url) {
-                window.location.href = result.redirect_url; // Redirect to verification page
-            } else {
-                window.location.href = "/login"; // Fallback
+            if (!username || !email || !password) return showError('Please fill in username, email, and password.');
+            if (!isValidEmail(email)) return showError('Please enter a valid email address.');
+            if (password.length < 6) return showError('Password must be at least 6 characters long.');
+            if (confirm && confirm !== password) return showError('Passwords do not match.');
+            if (!terms) return showError('Please accept the Terms and Privacy Policy.');
+
+            try {
+                const response = await fetch('/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+                const result = await response.json();
+                alert(result.message);
+                if (response.ok) {
+                    if (result.redirect_url) window.location.href = result.redirect_url; else window.location.href = '/login';
+                } else {
+                    showError(result.message || 'Sign up failed. Please try again.');
+                }
+            } catch (err) {
+                showError('Network error. Please try again.');
             }
-        }
-    });
-</script>
-
-
-</html>
+        });
+    </script>
+    </body>
+    </html>
